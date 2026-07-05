@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IB PYP Inquiry: Written FDP Quest</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Quicksand', sans-serif; }
+        h1, h2, h3, .font-fun { font-family: 'Fredoka', sans-serif; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+        .animate-shake { animation: shake 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="bg-amber-50/40 text-slate-700 min-h-screen flex flex-col justify-between">
+
+    <!-- Header Section -->
+    <header class="bg-white border-b-4 border-amber-200 shadow-sm py-4">
+        <div class="max-w-4xl mx-auto px-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-tr from-rose-400 to-amber-400 text-white p-2.5 rounded-2xl shadow-sm">
+                    <i data-lucide="trophy" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-800">FDP Inquiry Quiz</h1>
+                    <p class="text-xs text-slate-500">Pecahan, Desimal, & Persen</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <span id="streakDisplay" class="bg-rose-500 text-white px-4 py-1.5 rounded-full font-bold text-sm flex items-center gap-1 shadow-sm">
+                    <i data-lucide="flame" class="w-4 h-4 text-amber-300 fill-amber-300 animate-pulse"></i>
+                    <span id="streakCount">0</span> Streak
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-4xl mx-auto px-4 py-8 w-full flex flex-col justify-center">
+        <div id="quizContainer" class="bg-white rounded-3xl border-4 border-amber-200 shadow-xl overflow-hidden transition-all duration-300">
+            
+            <!-- Progress Bar -->
+            <div class="bg-slate-100 h-3 w-full">
+                <div id="quizProgress" class="h-full bg-gradient-to-r from-rose-400 to-amber-400 transition-all duration-500" style="width: 5%;"></div>
+            </div>
+            
+            <div id="quizPlayArea" class="p-6 md:p-8 space-y-6">
+                <!-- Info Soal Ke- Berapa -->
+                <div class="flex justify-between items-center text-sm font-bold text-slate-400">
+                    <span id="questionCounter">SOAL 1 DARI 20</span>
+                    <span id="scoreDisplay" class="text-emerald-500">Skor: 0</span>
+                </div>
+
+                <!-- Pertanyaan Utama -->
+                <div class="space-y-3 bg-gradient-to-r from-amber-50 to-orange-50 p-6 md:p-8 rounded-2xl border-2 border-amber-100 text-center shadow-inner">
+                    <span class="text-xs font-bold uppercase tracking-widest text-amber-600 bg-amber-100 px-3 py-1 rounded-full">Tantangan Konversi</span>
+                    <h3 id="quizQuestion" class="text-3xl md:text-4xl font-bold text-slate-800 pt-2"></h3>
+                </div>
+
+                <!-- Form Input Dua Kolom Konversi -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="inputSection">
+                    <div id="inputBoxAContainer" class="p-5 rounded-2xl border-2 bg-slate-50 border-slate-200 focus-within:border-amber-400 transition"></div>
+                    <div id="inputBoxBContainer" class="p-5 rounded-2xl border-2 bg-slate-50 border-slate-200 focus-within:border-amber-400 transition"></div>
+                </div>
+
+                <!-- Tombol Aksi -->
+                <button id="btnCheckAnswer" onclick="checkAnswers()" class="w-full py-4 bg-amber-400 hover:bg-amber-500 active:scale-[0.98] text-amber-950 font-bold rounded-2xl text-lg transition shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                    <i data-lucide="check-circle" class="w-5 h-5"></i>
+                    Periksa Jawaban
+                </button>
+
+                <!-- Feedback / Umpan Balik -->
+                <div id="feedbackBox" class="p-6 rounded-2xl border-4 hidden space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div id="feedbackIconContainer" class="p-2 rounded-xl text-white">
+                            <i id="feedbackIcon" class="w-6 h-6"></i>
+                        </div>
+                        <div id="feedbackIndicator" class="font-bold text-lg md:text-xl"></div>
+                    </div>
+                    <div id="feedbackText" class="text-slate-700 leading-relaxed border-t border-slate-100 pt-3"></div>
+                    
+                    <!-- Tombol ini hanya muncul jika JAWABAN BENAR -->
+                    <button id="btnNextQuiz" onclick="generateNextQuestion()" class="hidden w-full py-4 bg-rose-500 hover:bg-rose-600 active:scale-[0.98] text-white rounded-2xl font-bold text-lg transition shadow-md flex items-center justify-center gap-2">
+                        <span>Lanjut ke Soal Berikutnya</span>
+                        <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    </button>
+
+                    <!-- Tombol ini hanya muncul jika JAWABAN SALAH -->
+                    <button id="btnTryAgain" onclick="tryAgain()" class="hidden w-full py-4 bg-amber-500 hover:bg-amber-600 active:scale-[0.98] text-amber-950 rounded-2xl font-bold text-lg transition shadow-md flex items-center justify-center gap-2">
+                        <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                        <span>Coba Perbaiki Jawaban</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz End State (Hidden by Default) -->
+            <div id="quizEndArea" class="hidden p-8 text-center space-y-6">
+                <div class="inline-flex p-4 bg-amber-100 text-amber-600 rounded-full animate-bounce">
+                    <i data-lucide="award" class="w-16 h-16"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-slate-800">Luar Biasa! Tantangan Selesai 🎉</h2>
+                <p class="text-slate-600 max-w-md mx-auto">Kamu telah berhasil menuntaskan semua petualangan konversi Pecahan, Desimal, dan Persen dengan sangat baik!</p>
+                
+                <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <div>
+                        <div class="text-xs text-slate-400 font-bold uppercase">Skor Akhir</div>
+                        <div id="finalScore" class="text-2xl font-bold text-slate-800">100</div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-slate-400 font-bold uppercase">Beruntun Terbaik</div>
+                        <div id="bestStreak" class="text-2xl font-bold text-rose-500">0 🔥</div>
+                    </div>
+                </div>
+
+                <button onclick="restartQuiz()" class="px-8 py-3 bg-amber-400 hover:bg-amber-500 font-bold rounded-2xl transition shadow-md hover:shadow-lg">
+                    Ulangi Kuis
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-6 text-xs text-slate-400">
+        &copy; IB PYP Inquiry Math Quest • Dirancang untuk Keaktifan Berpikir Siswa
+    </footer>
+
+    <script>
+        // Bank Soal FDP (20 Soal)
+        const fdpPool = [
+            { id: 1, fNum: 1, fDen: 2, fText: "\\frac{1}{2}", dText: "0.5", pText: "50", type: 0 },
+            { id: 2, fNum: 3, fDen: 5, fText: "\\frac{3}{5}", dText: "0.6", pText: "60", type: 1 },
+            { id: 3, fNum: 7, fDen: 20, fText: "\\frac{7}{20}", dText: "0.35", pText: "35", type: 2 },
+            { id: 4, fNum: 1, fDen: 4, fText: "\\frac{1}{4}", dText: "0.25", pText: "25", type: 0 },
+            { id: 5, fNum: 1, fDen: 25, fText: "\\frac{1}{25}", dText: "0.04", pText: "4", type: 1 },
+            { id: 6, fNum: 9, fDen: 10, fText: "\\frac{9}{10}", dText: "0.9", pText: "90", type: 2 },
+            { id: 7, fNum: 2, fDen: 5, fText: "\\frac{2}{5}", dText: "0.4", pText: "40", type: 0 },
+            { id: 8, fNum: 3, fDen: 4, fText: "\\frac{3}{4}", dText: "0.75", pText: "75", type: 1 },
+            { id: 9, fNum: 1, fDen: 10, fText: "\\frac{1}{10}", dText: "0.1", pText: "10", type: 2 },
+            { id: 10, fNum: 1, fDen: 8, fText: "\\frac{1}{8}", dText: "0.125", pText: "12.5", type: 0 },
+            { id: 11, fNum: 3, fDen: 20, fText: "\\frac{3}{20}", dText: "0.15", pText: "15", type: 1 },
+            { id: 12, fNum: 12, fDen: 25, fText: "\\frac{12}{25}", dText: "0.48", pText: "48", type: 2 },
+            { id: 13, fNum: 1, fDen: 5, fText: "\\frac{1}{5}", dText: "0.2", pText: "20", type: 0 },
+            { id: 14, fNum: 3, fDen: 10, fText: "\\frac{3}{10}", dText: "0.3", pText: "30", type: 1 },
+            { id: 15, fNum: 17, fDen: 20, fText: "\\frac{17}{20}", dText: "0.85", pText: "85", type: 2 },
+            { id: 16, fNum: 3, fDen: 8, fText: "\\frac{3}{8}", dText: "0.375", pText: "37.5", type: 0 },
+            { id: 17, fNum: 4, fDen: 5, fText: "\\frac{4}{5}", dText: "0.8", pText: "80", type: 1 },
+            { id: 18, fNum: 9, fDen: 25, fText: "\\frac{9}{25}", dText: "0.36", pText: "36", type: 2 },
+            { id: 19, fNum: 7, fDen: 10, fText: "\\frac{7}{10}", dText: "0.7", pText: "70", type: 0 },
+            { id: 20, fNum: 13, fDen: 50, fText: "\\frac{13}{50}", dText: "0.26", pText: "26", type: 1 }
+        ];
+
+        let qIdx = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let score = 0;
+        let currentItem = null;
+        let attemptsThisQuestion = 0;
+
+        // Memuat Ikon Lucide pertama kali
+        lucide.createIcons();
+
+        function generateQuestion() {
+            currentItem = fdpPool[qIdx];
+            attemptsThisQuestion = 0; 
+            const contA = document.getElementById('inputBoxAContainer');
+            const contB = document.getElementById('inputBoxBContainer');
+
+            document.getElementById('questionCounter').innerText = `SOAL ${qIdx + 1} DARI 20`;
+            document.getElementById('scoreDisplay').innerText = `Skor: ${score}`;
+
+            // Reset box gaya
+            contA.className = "p-5 rounded-2xl border-2 bg-slate-50 border-slate-200 focus-within:border-amber-400 transition";
+            contB.className = "p-5 rounded-2xl border-2 bg-slate-50 border-slate-200 focus-within:border-amber-400 transition";
+
+            if (currentItem.type === 0) {
+                // Diketahui Pecahan, Cari Desimal dan Persen
+                document.getElementById('quizQuestion').innerHTML = `Konversi: $${currentItem.fText}$`;
+                
+                contA.innerHTML = `
+                    <label class="block text-sm font-bold text-slate-500 mb-2 uppercase tracking-wide">Desimal ✏️</label>
+                    <input type="text" id="ansD" placeholder="..." class="w-full p-4 rounded-xl border-2 border-slate-200 text-center font-bold text-xl focus:border-amber-400 focus:outline-none transition">
+                    <p class="text-[11px] text-slate-400 mt-2">Gunakan titik (.) sebagai pemisah desimal</p>
+                `;
+                
+                contB.innerHTML = `
+                    <label class="block text-sm font-bold text-slate-500 mb-2 uppercase tracking-wide">Persen (%) 🎯</label>
+                    <div class="relative flex items-center">
+                        <input type="text" id="ansP" placeholder="..." class="w-full p-4 pr-12 rounded-xl border-2 border-slate-200 text-center font-bold text-xl focus:border-amber-400 focus:outline-none transition">
+                        <span class="absolute right-4 font-bold text-slate-400 text-lg">%</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-2">Tuliskan angka persentasenya saja</p>
+                `;
+            } else if (currentItem.type === 1) {
+                // Diketahui Desimal, Cari Pecahan dan Persen
+                document.getElementById('quizQuestion').innerHTML = `Konversi: $${currentItem.dText}$`;
+                
+                contA.innerHTML = `
+                    <label class="block text-sm font-bold text-slate-500 mb-2 uppercase tracking-wide">Pecahan Biasa 📊</label>
+                    <div class="flex items-center gap-2">
+                        <input type="number" id="num" placeholder="Pembilang" class="w-1/2 p-3 rounded-xl border-2 border-slate-200 text-center font-bold text-lg focus:border-amber-400 focus:outline-none transition">
+                        <span class="text-xl font-bold text-slate-400">/</span>
+                        <input type="number" id="den" placeholder="Penyebut" class="w-1/2 p-3 rounded-xl border-2 border-slate-200 text-center font-bold text-lg focus:border-amber-400 focus:outline-none transition">
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-2">Masukkan nilai pecahan yang paling sederhana</p>
+                `;
+                
+                contB.innerHTML = `
+                    <label class="block text-sm font-bold text-slate-500 mb-2 uppercase tracking-wide">Persen (%) 🎯</label>
+                    <div class="relative flex items-center">
+                        <input type="text" id="ansP" placeholder="..." class="w-full p-4 pr-12 rounded-xl border-2 border-slate-200 text-center font-bold text-xl focus:border-amber-400 focus:outline-none transition">
+                        <span class="absolute right-4 font-bold text-slate-400 text-lg">%</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-2">Tuliskan angka persentasenya saja</p>
+                `;
+            } else {
+                // Diketahui Persen, Cari Pecahan dan Desimal
+                document.getElementById('quizQuestion').innerHTML = `Konversi: $${currentItem.pText}\\%$`;
+                
+                contA.innerHTML = `
+                    <label class="block text-sm font-bold text-slate-500 mb-2 uppercase tracking-wide">Pecahan Biasa 📊</label>
+                    <div class="flex items-center gap-2">
+                        <input type="number" id="num" placeholder="Pembilang" class="w-1/2 p-3 rounded-xl border-2 border-slate-200 text-center font-bold text-lg focus:border-amber-400 focus:outline-none transition">
+                        <span class="text-xl font-bold text-slate-400">/</span>
+                        <input type="number" id="den" placeholder="Penyebut" class="w-1/2 p-3 rounded-xl border-2 border-slate-200 text-center font-bold text-lg focus:border-amber-400 focus:outline-none transition">
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-2">Masukkan nilai pecahan yang paling sederhana</p>
+                `;
+                
+                contB.innerHTML = `
+                    <label class="block text-sm font-bold text-slate-500 mb-2 uppercase tracking-wide">Desimal ✏️</label>
+                    <input type="text" id="ansD" placeholder="..." class="w-full p-4 rounded-xl border-2 border-slate-200 text-center font-bold text-xl focus:border-amber-400 focus:outline-none transition">
+                    <p class="text-[11px] text-slate-400 mt-2">Gunakan titik (.) sebagai pemisah desimal</p>
+                `;
+            }
+
+            // Atur Visibilitas Awal
+            document.getElementById('feedbackBox').classList.add('hidden');
+            document.getElementById('btnCheckAnswer').classList.remove('hidden');
+            document.getElementById('inputSection').style.pointerEvents = 'auto';
+            document.getElementById('quizProgress').style.width = `${((qIdx) / 20) * 100}%`;
+            
+            // Re-render simbol Matematika LaTeX
+            MathJax.typesetPromise();
+            lucide.createIcons();
+        }
+
+        function checkAnswers() {
+            let isCorrect = false;
+            let explanation = '';
+            attemptsThisQuestion++;
+
+            const ansDElement = document.getElementById('ansD');
+            const ansPElement = document.getElementById('ansP');
+            const numElement = document.getElementById('num');
+            const denElement = document.getElementById('den');
+
+            // Format input pengguna
+            const userD = ansDElement ? ansDElement.value.trim().replace(',', '.') : '';
+            const userP = ansPElement ? ansPElement.value.trim().replace('%', '') : '';
+            const userNum = numElement ? parseInt(numElement.value) : NaN;
+            const userDen = denElement ? parseInt(denElement.value) : NaN;
+
+            // Logika Validasi berdasarkan Tipe Soal
+            if (currentItem.type === 0) {
+                // Diketahui Pecahan -> Cari Desimal dan Persen
+                const dMatch = parseFloat(userD) === parseFloat(currentItem.dText);
+                const pMatch = parseFloat(userP) === parseFloat(currentItem.pText);
+
+                if (dMatch && pMatch) {
+                    isCorrect = true;
+                    explanation = `Hebat! Pecahan $${currentItem.fText}$ setara dengan desimal **${currentItem.dText}** dan persen **${currentItem.pText}%**.`;
+                } else {
+                    // Petunjuk konsep umum (TIDAK membocorkan angka jawaban)
+                    explanation = `Ada yang belum tepat. Ingat konsepnya:<br>
+                    • **Desimal**: Bagi angka pembilang dengan penyebutnya.<br>
+                    • **Persen**: Kalikan hasil desimal tersebut dengan 100.`;
+                }
+            } else if (currentItem.type === 1) {
+                // Diketahui Desimal -> Cari Pecahan dan Persen
+                const fMatch = (userNum === currentItem.fNum && userDen === currentItem.fDen);
+                const pMatch = parseFloat(userP) === parseFloat(currentItem.pText);
+
+                if (fMatch && pMatch) {
+                    isCorrect = true;
+                    explanation = `Keren! Desimal **${currentItem.dText}** setara dengan pecahan sederhana $${currentItem.fText}$ dan persen **${currentItem.pText}%**.`;
+                } else {
+                    // Petunjuk konsep umum (TIDAK membocorkan angka pecahan dan persen sesungguhnya)
+                    explanation = `Ada yang belum tepat. Ingat konsepnya:<br>
+                    • **Pecahan**: Tulis pecahan per sepuluh, per seratus, atau per seribu berdasarkan jumlah angka di belakang koma desimal, kemudian sederhanakan sesederhana mungkin.<br>
+                    • **Persen**: Kalikan nilai desimal tersebut dengan 100.`;
+                }
+            } else {
+                // Diketahui Persen -> Cari Pecahan dan Desimal
+                const fMatch = (userNum === currentItem.fNum && userDen === currentItem.fDen);
+                const dMatch = parseFloat(userD) === parseFloat(currentItem.dText);
+
+                if (fMatch && dMatch) {
+                    isCorrect = true;
+                    explanation = `Luar biasa! Persen **${currentItem.pText}%** setara dengan pecahan sederhana $${currentItem.fText}$ dan desimal **${currentItem.dText}**.`;
+                } else {
+                    // Petunjuk konsep umum (TIDAK membocorkan pecahan dan desimal sesungguhnya)
+                    explanation = `Ada yang belum tepat. Ingat konsepnya:<br>
+                    • **Pecahan**: Persen artinya 'per seratus'. Tulis angka tersebut per 100, lalu sederhanakan hingga tidak bisa dibagi lagi.<br>
+                    • **Desimal**: Bagilah angka persen tersebut dengan 100.`;
+                }
+            }
+
+            // Tampilkan Panel Hasil Koreksi
+            showFeedback(isCorrect, explanation);
+        }
+
+        function showFeedback(isCorrect, text) {
+            const fbBox = document.getElementById('feedbackBox');
+            const fbIndicator = document.getElementById('feedbackIndicator');
+            const fbText = document.getElementById('feedbackText');
+            const fbIcon = document.getElementById('feedbackIcon');
+            const fbIconContainer = document.getElementById('feedbackIconContainer');
+            const btnCheck = document.getElementById('btnCheckAnswer');
+            const quizContainer = document.getElementById('quizContainer');
+            
+            const btnNext = document.getElementById('btnNextQuiz');
+            const btnTryAgain = document.getElementById('btnTryAgain');
+
+            btnCheck.classList.add('hidden');
+            fbBox.classList.remove('hidden');
+            document.getElementById('inputSection').style.pointerEvents = 'none';
+
+            if (isCorrect) {
+                if (attemptsThisQuestion === 1) {
+                    score += 5;
+                    streak++;
+                } else {
+                    score += 2; 
+                    streak = 1; 
+                }
+                
+                if (streak > maxStreak) maxStreak = streak;
+
+                fbBox.className = "p-6 rounded-2xl border-4 border-emerald-200 bg-emerald-50/70 space-y-4";
+                fbIndicator.innerText = "Jawaban Tepat!";
+                fbIndicator.className = "font-bold text-xl text-emerald-700";
+                fbIconContainer.className = "p-2 rounded-xl bg-emerald-500 text-white";
+                fbIcon.setAttribute('data-lucide', 'smile');
+                
+                btnNext.classList.remove('hidden');
+                btnTryAgain.classList.add('hidden');
+                
+                quizContainer.classList.remove('animate-shake');
+            } else {
+                streak = 0;
+                fbBox.className = "p-6 rounded-2xl border-4 border-rose-200 bg-rose-50/70 space-y-4";
+                fbIndicator.innerText = "Mari Coba Lagi!";
+                fbIndicator.className = "font-bold text-xl text-rose-700";
+                fbIconContainer.className = "p-2 rounded-xl bg-rose-500 text-white";
+                fbIcon.setAttribute('data-lucide', 'alert-circle');
+                
+                btnNext.classList.add('hidden');
+                btnTryAgain.classList.remove('hidden');
+                
+                quizContainer.classList.add('animate-shake');
+                setTimeout(() => quizContainer.classList.remove('animate-shake'), 400);
+            }
+
+            fbText.innerHTML = text;
+            document.getElementById('streakCount').innerText = streak;
+            MathJax.typesetPromise();
+            lucide.createIcons();
+        }
+
+        function tryAgain() {
+            document.getElementById('feedbackBox').classList.add('hidden');
+            document.getElementById('btnCheckAnswer').classList.remove('hidden');
+            document.getElementById('inputSection').style.pointerEvents = 'auto';
+        }
+
+        function generateNextQuestion() {
+            qIdx++;
+            if (qIdx < fdpPool.length) {
+                generateQuestion();
+            } else {
+                showQuizEnd();
+            }
+        }
+
+        function showQuizEnd() {
+            document.getElementById('quizPlayArea').classList.add('hidden');
+            document.getElementById('quizEndArea').classList.remove('hidden');
+            document.getElementById('quizProgress').style.width = `100%`;
+            
+            document.getElementById('finalScore').innerText = score;
+            document.getElementById('bestStreak').innerText = `${maxStreak} 🔥`;
+        }
+
+        function restartQuiz() {
+            qIdx = 0;
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            
+            document.getElementById('quizPlayArea').classList.remove('hidden');
+            document.getElementById('quizEndArea').classList.add('hidden');
+            
+            generateQuestion();
+        }
+
+        window.onload = function() {
+            generateQuestion();
+        }
+    </script>
+</body>
+</html>
